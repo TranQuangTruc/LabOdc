@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: labodc
+      POSTGRES_USER: labodc
+      POSTGRES_PASSWORD: labodc
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  admin-service:
+    build: .
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/labodc
+      SPRING_DATASOURCE_USERNAME: labodc
+      SPRING_DATASOURCE_PASSWORD: labodc
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update

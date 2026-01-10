@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: auth-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/lab
+    username: root
+    password: 1234
+
+server:
+  port: 8080
+  servlet:
+    context-path: /authentication
+
+jwt:
+  signerKey: "97d8addf35d4a49d54e78b189f566e0199c8daade3b8cc612b16c24582fc7b14"
+  valid-duration: 10 #hours
+  refreshable-duration: 48 #hours
