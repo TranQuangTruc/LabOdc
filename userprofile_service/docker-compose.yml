@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -45,8 +43,8 @@ services:
       RABBITMQ_DEFAULT_USER: labodc
       RABBITMQ_DEFAULT_PASS: labodc_password
     ports:
-      - "5672:5672"   # AMQP port
-      - "15672:15672" # Management UI
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
@@ -60,7 +58,7 @@ services:
   # User Profile Service
   user-profile-service:
     build:
-      context: .
+      context: ./labodc-user-profile-service
       dockerfile: Dockerfile
     container_name: labodc-user-profile-service
     environment:
@@ -86,6 +84,19 @@ services:
     networks:
       - labodc-network
     restart: unless-stopped
+
+  # Frontend (React + Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: labodc-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - user-profile-service
+    networks:
+      - labodc-network
 
 volumes:
   postgres_data:
