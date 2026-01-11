@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: labodc-postgres
+    environment:
+      POSTGRES_DB: labodc
+      POSTGRES_USER: labodc
+      POSTGRES_PASSWORD: labodc123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: labodc-redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: labodc-rabbitmq
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # Web management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  admin-service:
+    build: .
+    container_name: labodc-admin
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/labodc
+      SPRING_DATASOURCE_USERNAME: labodc
+      SPRING_DATASOURCE_PASSWORD: labodc123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+    volumes:
+      - ./data/templates:/app/templates
+
+volumes:
+  pgdata:

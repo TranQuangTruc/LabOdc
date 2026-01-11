@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/labodc
+    username: labodc
+    password: labodc
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # <--- Hibernate tự tạo table
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.use_sql_comments: true
+
+  redis:
+    host: redis
+    port: 6379
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
