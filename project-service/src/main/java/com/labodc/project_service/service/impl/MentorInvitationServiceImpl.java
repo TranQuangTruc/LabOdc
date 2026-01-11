@@ -33,7 +33,7 @@ public class MentorInvitationServiceImpl implements MentorInvitationService {
         projectMentor.setProjectId(invitation.getProjectId());
         projectMentor.setMentorId(invitation.getMentorId());
         projectMentor.setJoinedAt(LocalDateTime.now());
-        projectMentor.setRole("MENTOR"); // Role mặc định khi tham gia
+        projectMentor.setRole("MENTOR");
         projectMentor.setStatus("ACTIVE");
 
         projectMentorRepo.save(projectMentor);

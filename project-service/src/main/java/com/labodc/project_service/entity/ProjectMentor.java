@@ -17,7 +17,7 @@ public class ProjectMentor {
 
     @Id
     @Column(length = 36, nullable = false, updatable = false)
-    @JdbcTypeCode(SqlTypes.VARCHAR) // Đảm bảo lưu dưới dạng String trong MySQL
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private String id = java.util.UUID.randomUUID().toString();
 
     @Column(name = "project_id", nullable = false)
@@ -27,11 +27,11 @@ public class ProjectMentor {
     private String mentorId;
 
     @Column(name = "role")
-    private String role; // Thường là "MENTOR"
+    private String role;
 
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
 
     @Column(name = "status")
-    private String status; // Thường là "ACTIVE"
+    private String status;
 }

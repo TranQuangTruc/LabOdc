@@ -1,11 +1,14 @@
 package com.labodc.project_service.service.impl;
 
+import com.labodc.project_service.dto.ApplyProjectRequest;
 import com.labodc.project_service.dto.IdeaReviewRequest;
 import com.labodc.project_service.dto.IdeaSubmitRequest;
 import com.labodc.project_service.entity.Idea;
 import com.labodc.project_service.entity.Notification;
+import com.labodc.project_service.entity.ProjectApplication;
 import com.labodc.project_service.repository.IdeaRepository;
 import com.labodc.project_service.repository.NotificationRepository;
+import com.labodc.project_service.repository.ProjectApplicationRepository;
 import com.labodc.project_service.service.IdeaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,20 +25,19 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Idea submitIdea(IdeaSubmitRequest request) {
-        // Logic để Enterprise gửi dự án mới
         Idea idea = new Idea();
         idea.setTitle(request.getTitle());
         idea.setDescription(request.getDescription());
-        idea.setOwnerId(request.getEnterpriseId()); // Lưu ID của Enterprise
+        idea.setOwnerId(request.getEnterpriseId());
         idea.setSpecialtyId(request.getSpecialtyId());
-        idea.setStatus("PENDING"); // Trạng thái mặc định là chờ duyệt
+        idea.setStatus("PENDING");
 
         return ideaRepository.save(idea);
     }
 
     @Override
     public List<Idea> getPendingIdeas() {
-        // LabAdmin lấy danh sách dự án đang chờ duyệt
+
         return ideaRepository.findAll().stream()
                 .filter(i -> "PENDING".equals(i.getStatus()))
                 .toList();
@@ -63,5 +65,26 @@ public class IdeaServiceImpl implements IdeaService {
         notificationRepository.save(notify);
 
         return savedIdea;
+    }
+    private final ProjectApplicationRepository applicationRepository;
+
+    @Override
+    public List<Idea> getApprovedProjects() {
+
+        return ideaRepository.findAll().stream()
+                .filter(idea -> "APPROVED".equals(idea.getStatus()))
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public ProjectApplication applyToProject(ApplyProjectRequest request) {
+        ProjectApplication application = new ProjectApplication();
+        application.setProjectId(request.getProjectId());
+        application.setTalentId(request.getTalentId());
+        application.setMessage(request.getMessage());
+        application.setStatus("PENDING");
+
+        return applicationRepository.save(application);
     }
 }

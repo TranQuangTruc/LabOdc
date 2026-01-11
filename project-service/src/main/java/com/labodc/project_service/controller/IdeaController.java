@@ -1,8 +1,10 @@
 package com.labodc.project_service.controller;
 
+import com.labodc.project_service.dto.ApplyProjectRequest;
 import com.labodc.project_service.dto.IdeaReviewRequest;
 import com.labodc.project_service.dto.IdeaSubmitRequest;
 import com.labodc.project_service.entity.Idea;
+import com.labodc.project_service.entity.ProjectApplication;
 import com.labodc.project_service.service.IdeaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,5 +31,14 @@ public class IdeaController {
     @GetMapping("/pending")
     public ResponseEntity<List<Idea>> getPending() {
         return ResponseEntity.ok(ideaService.getPendingIdeas());
+    }
+    @GetMapping("/approved")
+    public ResponseEntity<List<Idea>> getApproved() {
+        return ResponseEntity.ok(ideaService.getApprovedProjects());
+    }
+
+    @PostMapping("/apply")
+    public ResponseEntity<ProjectApplication> apply(@RequestBody ApplyProjectRequest request) {
+        return ResponseEntity.ok(ideaService.applyToProject(request));
     }
 }
