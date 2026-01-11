@@ -21,5 +21,4 @@ public class LabAdmin {
     String userId;
     String fullname;
     String status;
-
 }
