@@ -1,34 +1,14 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Enterprise Profile</title>
-    <link rel="stylesheet" href="css/style.css">
-    <h2>Enterprise Profile</h2>
+<h2>Enterprise Profile</h2>
 
-</head>
-<body>
+<form onsubmit="saveEnterprise(event)">
+    <input id="companyName" placeholder="Ten cong ty" required>
+    <input id="companyEmail" placeholder="Email cong ty">
+    <input id="phone" placeholder="So dien thoai">
+    <input id="website" placeholder="Website">
+    <button type="submit">Luu</button>
+</form>
 
-<div class="container">
-    <h2>Enterprise Profile</h2>
+<pre id="result"></pre>
 
-    <label>Company Name</label>
-    <input id="companyName">
-
-    <label>Tax Code</label>
-    <input id="taxCode">
-
-    <label>Website</label>
-    <input id="website">
-
-    <label>Description</label>
-    <textarea id="description"></textarea>
-
-    <button onclick="updateEnterpriseProfile()">Cap nhat</button>
-
-    <div class="message" id="message"></div>
-</div>
-
-<script src="js/app.js"></script>
-</body>
-</html>
+<script src="js/config.js"></script>
+<script src="js/enterprise-profile.js"></script>
