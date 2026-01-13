@@ -1,0 +1,6 @@
+{
+    "api": {
+        "login": "http://localhost:8080/identity/authentication/login",
+        "register": "http://localhost:8080/identity/users"
+    }
+}
