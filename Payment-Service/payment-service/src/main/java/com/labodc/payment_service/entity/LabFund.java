@@ -3,8 +3,8 @@ package com.labodc.payment_service.entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -13,9 +13,9 @@ import jakarta.persistence.Table;
 public class LabFund {
 
     @Id
-    @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false)
     private BigDecimal balance;
 
     public LabFund() {

@@ -2,6 +2,7 @@ package com.labodc.payment_service.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,11 +11,9 @@ import com.labodc.payment_service.dto.FundDistributionDTO;
 import com.labodc.payment_service.dto.PaymentRequestDTO;
 import com.labodc.payment_service.dto.PaymentResponseDTO;
 import com.labodc.payment_service.entity.FundDistribution;
-import com.labodc.payment_service.entity.LabFund;
 import com.labodc.payment_service.entity.PaymentStatus;
 import com.labodc.payment_service.entity.ProjectPayment;
 import com.labodc.payment_service.repository.FundDistributionRepository;
-import com.labodc.payment_service.repository.LabFundRepository;
 import com.labodc.payment_service.repository.ProjectPaymentRepository;
 import com.labodc.payment_service.service.PaymentService;
 
@@ -22,109 +21,116 @@ import com.labodc.payment_service.service.PaymentService;
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
 
-    private final ProjectPaymentRepository paymentRepository;
-    private final FundDistributionRepository distributionRepository;
-    private final LabFundRepository labFundRepository;
+    private final FundDistributionRepository fundDistributionRepository;
+    private final ProjectPaymentRepository projectPaymentRepository;
 
-    public PaymentServiceImpl(ProjectPaymentRepository paymentRepository,
-                              FundDistributionRepository distributionRepository,
-                              LabFundRepository labFundRepository) {
-        this.paymentRepository = paymentRepository;
-        this.distributionRepository = distributionRepository;
-        this.labFundRepository = labFundRepository;
+    public PaymentServiceImpl(
+            FundDistributionRepository fundDistributionRepository,
+            ProjectPaymentRepository projectPaymentRepository) {
+        this.fundDistributionRepository = fundDistributionRepository;
+        this.projectPaymentRepository = projectPaymentRepository;
     }
 
-    /**
-     * Enterprise thanh toán bình thường
-     */
+    // ============================
+    // Enterprise pays for project
+    // ============================
     @Override
     public PaymentResponseDTO processEnterprisePayment(PaymentRequestDTO request) {
 
-        ProjectPayment payment = createBasePayment(request);
+        // 1. Tạo ProjectPayment
+        ProjectPayment payment = new ProjectPayment();
+        payment.setProjectId(request.getProjectId());
+        payment.setTotalAmount(request.getAmount());
         payment.setStatus(PaymentStatus.PAID);
         payment.setAdvancedByLab(false);
+        payment.setCreatedAt(LocalDateTime.now());
 
-        paymentRepository.save(payment);
+        projectPaymentRepository.save(payment);
 
-        FundDistribution distribution = createDistribution(payment);
+        // 2. Chia tiền
+        FundDistribution dist = calculateDistribution(request.getAmount());
+        dist.setPaymentId(payment.getId());
 
-        distributionRepository.save(distribution);
+        fundDistributionRepository.save(dist);
 
-        return buildResponse(payment, distribution);
+        // 3. Response
+        return buildResponse(payment.getId(), dist, payment.getStatus());
     }
 
-    /**
-     * Lab tạm ứng khi enterprise chưa trả
-     */
+    // ============================
+    // Lab ứng tiền cho project
+    // ============================
     @Override
     public PaymentResponseDTO advancePaymentByLab(PaymentRequestDTO request) {
 
-        LabFund labFund = labFundRepository.findAll()
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Lab fund not initialized"));
-
-        if (labFund.getBalance().compareTo(request.getTotalAmount()) < 0) {
-            throw new RuntimeException("Lab fund is insufficient for advance payment");
-        }
-
-        // Trừ tiền Lab
-        labFund.setBalance(labFund.getBalance().subtract(request.getTotalAmount()));
-        labFundRepository.save(labFund);
-
-        ProjectPayment payment = createBasePayment(request);
-        payment.setStatus(PaymentStatus.ADVANCED_BY_LAB);
-        payment.setAdvancedByLab(true);
-
-        paymentRepository.save(payment);
-
-        FundDistribution distribution = createDistribution(payment);
-        distributionRepository.save(distribution);
-
-        return buildResponse(payment, distribution);
-    }
-
-    /* ================== PRIVATE METHODS ================== */
-
-    private ProjectPayment createBasePayment(PaymentRequestDTO request) {
         ProjectPayment payment = new ProjectPayment();
         payment.setProjectId(request.getProjectId());
-        payment.setEnterpriseId(request.getEnterpriseId());
-        payment.setTotalAmount(request.getTotalAmount());
+        payment.setTotalAmount(request.getAmount());
+        payment.setStatus(PaymentStatus.ADVANCED_BY_LAB);
+        payment.setAdvancedByLab(true);
         payment.setCreatedAt(LocalDateTime.now());
-        return payment;
+
+        projectPaymentRepository.save(payment);
+
+        FundDistribution dist = calculateDistribution(request.getAmount());
+        dist.setPaymentId(payment.getId());
+
+        fundDistributionRepository.save(dist);
+
+        return buildResponse(payment.getId(), dist, payment.getStatus());
     }
 
-    private FundDistribution createDistribution(ProjectPayment payment) {
-        BigDecimal total = payment.getTotalAmount();
+    // ============================
+    // Query
+    // ============================
+    @Override
+    public PaymentResponseDTO getPaymentById(UUID id) {
 
-        FundDistribution distribution = new FundDistribution();
-        distribution.setPaymentId(payment.getId());
-        distribution.setTeamAmount(calculatePercent(total, 70));
-        distribution.setMentorAmount(calculatePercent(total, 20));
-        distribution.setLabAmount(calculatePercent(total, 10));
+        ProjectPayment payment = projectPaymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        return distribution;
+        FundDistribution dist = fundDistributionRepository
+                .findAll()
+                .stream()
+                .filter(d -> d.getPaymentId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Distribution not found"));
+
+        return buildResponse(payment.getId(), dist, payment.getStatus());
     }
 
-    private BigDecimal calculatePercent(BigDecimal total, int percent) {
-        return total.multiply(BigDecimal.valueOf(percent))
-                    .divide(BigDecimal.valueOf(100));
+    // ============================
+    // Business logic chia tiền
+    // ============================
+    private FundDistribution calculateDistribution(BigDecimal total) {
+
+        BigDecimal team = total.multiply(new BigDecimal("0.6"));
+        BigDecimal mentor = total.multiply(new BigDecimal("0.2"));
+        BigDecimal lab = total.multiply(new BigDecimal("0.2"));
+
+        FundDistribution d = new FundDistribution();
+        d.setTeamAmount(team);
+        d.setMentorAmount(mentor);
+        d.setLabAmount(lab);
+
+        return d;
     }
 
-    private PaymentResponseDTO buildResponse(ProjectPayment payment,
-                                             FundDistribution distribution) {
+    // ============================
+    // Mapper
+    // ============================
+    private PaymentResponseDTO buildResponse(UUID paymentId, FundDistribution dist, PaymentStatus status) {
 
-        FundDistributionDTO fundDTO = new FundDistributionDTO();
-        fundDTO.setTeam(distribution.getTeamAmount());
-        fundDTO.setMentor(distribution.getMentorAmount());
-        fundDTO.setLab(distribution.getLabAmount());
+        FundDistributionDTO dto = new FundDistributionDTO();
+        dto.setTeam(dist.getTeamAmount());
+        dto.setMentor(dist.getMentorAmount());
+        dto.setLab(dist.getLabAmount());
 
-        PaymentResponseDTO response = new PaymentResponseDTO();
-        response.setPaymentId(payment.getId());
-        response.setDistribution(fundDTO);
-        response.setStatus(payment.getStatus().name());
+        PaymentResponseDTO res = new PaymentResponseDTO();
+        res.setPaymentId(paymentId);
+        res.setDistribution(dto);
+        res.setStatus(status.name());
 
-        return response;
+        return res;
     }
 }

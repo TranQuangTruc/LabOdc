@@ -3,11 +3,15 @@ package com.labodc.payment_service.dto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import jakarta.validation.constraints.NotNull;
+
 public class PaymentRequestDTO {
 
+    @NotNull
     private UUID projectId;
-    private UUID enterpriseId;
-    private BigDecimal totalAmount;
+
+    @NotNull
+    private BigDecimal amount;
 
     public PaymentRequestDTO() {
     }
@@ -20,19 +24,11 @@ public class PaymentRequestDTO {
         this.projectId = projectId;
     }
 
-    public UUID getEnterpriseId() {
-        return enterpriseId;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setEnterpriseId(UUID enterpriseId) {
-        this.enterpriseId = enterpriseId;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }

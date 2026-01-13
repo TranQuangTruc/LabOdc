@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LabOdc Payment Console</title>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 40px;
+      background: #f5f7fa;
+    }
+    h2 {
+      color: #333;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      width: 500px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+    button {
+      background: #4CAF50;
+      border: none;
+      padding: 10px 16px;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button.lab {
+      background: #2196F3;
+    }
+    pre {
+      background: #222;
+      color: #0f0;
+      padding: 10px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+
+<h1>LabOdc Payment Service</h1>
+
+<div class="box">
+  <h2>Enterprise Pay</h2>
+  <label>Project ID</label>
+  <input id="epProject" placeholder="UUID project">
+  <label>Amount</label>
+  <input id="epAmount" placeholder="10000000">
+
+  <button onclick="enterprisePay()">Enterprise Pay</button>
+</div>
+
+<div class="box">
+  <h2>Lab Advance to Team</h2>
+  <label>Project ID</label>
+  <input id="labProject" placeholder="UUID project">
+  <label>Amount</label>
+  <input id="labAmount" placeholder="3000000">
+
+  <button class="lab" onclick="labAdvance()">Lab Advance</button>
+</div>
+
+<div class="box">
+  <h2>Get Payment</h2>
+  <label>Payment ID</label>
+  <input id="paymentId" placeholder="UUID payment">
+  <button onclick="getPayment()">Get</button>
+</div>
+
+<div class="box">
+  <h2>Response</h2>
+  <pre id="output"></pre>
+</div>
+
+<script>
+const BASE = "http://localhost:8080/api/payments";
+
+function show(res) {
+  document.getElementById("output").textContent =
+    JSON.stringify(res, null, 2);
+}
+
+async function enterprisePay() {
+  const res = await fetch(BASE + "/enterprise-pay", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      projectId: document.getElementById("epProject").value,
+      amount: document.getElementById("epAmount").value
+    })
+  });
+  show(await res.json());
+}
+
+async function labAdvance() {
+  const res = await fetch(BASE + "/lab-advance", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      projectId: document.getElementById("labProject").value,
+      amount: document.getElementById("labAmount").value
+    })
+  });
+  show(await res.json());
+}
+
+async function getPayment() {
+  const id = document.getElementById("paymentId").value;
+  const res = await fetch(BASE + "/" + id);
+  show(await res.json());
+}
+</script>
+
+</body>
+</html>

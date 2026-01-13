@@ -64,4 +64,8 @@ public class FundDistribution {
     public void setLabAmount(BigDecimal labAmount) {
         this.labAmount = labAmount;
     }
+
+    public void setAmount(BigDecimal amount) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
