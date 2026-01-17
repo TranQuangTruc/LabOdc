@@ -1,6 +1,7 @@
 package com.labodc.project_service.controller;
 
 import com.labodc.project_service.dto.ApplyProjectRequest;
+import com.labodc.project_service.dto.IdeaChangeRequest;
 import com.labodc.project_service.dto.IdeaReviewRequest;
 import com.labodc.project_service.dto.IdeaSubmitRequest;
 import com.labodc.project_service.entity.Idea;
@@ -40,5 +41,14 @@ public class IdeaController {
     @PostMapping("/apply")
     public ResponseEntity<ProjectApplication> apply(@RequestBody ApplyProjectRequest request) {
         return ResponseEntity.ok(ideaService.applyToProject(request));
+    }
+    @PutMapping("/{id}/request-change")
+    public ResponseEntity<Idea> requestChange(@PathVariable String id, @RequestBody IdeaChangeRequest request) {
+        return ResponseEntity.ok(ideaService.requestChangeOrCancel(id, request));
+    }
+    
+    @PutMapping("/{id}/review-change")
+    public ResponseEntity<Idea> reviewChange(@PathVariable String id, @RequestParam boolean isAccepted) {
+        return ResponseEntity.ok(ideaService.approveChangeOrCancel(id, isAccepted));
     }
 }

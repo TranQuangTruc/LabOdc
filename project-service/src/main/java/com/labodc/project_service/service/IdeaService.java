@@ -1,6 +1,7 @@
 package com.labodc.project_service.service;
 
 import com.labodc.project_service.dto.ApplyProjectRequest;
+import com.labodc.project_service.dto.IdeaChangeRequest;
 import com.labodc.project_service.dto.IdeaReviewRequest;
 import com.labodc.project_service.dto.IdeaSubmitRequest;
 import com.labodc.project_service.entity.Idea;
@@ -14,4 +15,6 @@ public interface IdeaService {
     List<Idea> getPendingIdeas();
     List<Idea> getApprovedProjects();
     ProjectApplication applyToProject(ApplyProjectRequest request);
+    Idea requestChangeOrCancel(String id, IdeaChangeRequest request);
+    Idea approveChangeOrCancel(String id, boolean isAccepted);
 }
