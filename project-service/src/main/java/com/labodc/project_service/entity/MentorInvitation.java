@@ -17,8 +17,8 @@ public class MentorInvitation {
 
     @Id
     @Column(length = 36, nullable = false, updatable = false)
-    @JdbcTypeCode(SqlTypes.VARCHAR) // Ép Hibernate lưu UUID dưới dạng chuỗi VARCHAR thay vì Binary
-    private String id = java.util.UUID.randomUUID().toString(); // Tự động tạo ID chuỗi khi khởi tạo
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private String id = java.util.UUID.randomUUID().toString();
 
     @Column(name = "project_id", nullable = false)
     private String projectId;
@@ -27,7 +27,7 @@ public class MentorInvitation {
     private String mentorId;
 
     @Column(name = "status")
-    private String status; // Giá trị sẽ là "PENDING", "ACCEPTED"
+    private String status;
 
     @Column(name = "invited_at")
     private LocalDateTime invitedAt;

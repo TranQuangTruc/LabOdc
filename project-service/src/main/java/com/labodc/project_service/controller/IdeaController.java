@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/ideas")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class IdeaController {
     private final IdeaService ideaService;
 
@@ -51,4 +52,14 @@ public class IdeaController {
     public ResponseEntity<Idea> reviewChange(@PathVariable String id, @RequestParam boolean isAccepted) {
         return ResponseEntity.ok(ideaService.approveChangeOrCancel(id, isAccepted));
     }
+    @PutMapping("/{id}/accept")
+    public ResponseEntity<Idea> acceptProject(@PathVariable String id) {
+        return ResponseEntity.ok(ideaService.approveChangeOrCancel(id, true));
+    }
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectProject(@PathVariable String id) {
+        ideaService.approveChangeOrCancel(id, false);
+        return ResponseEntity.ok().build();
+    }
+
 }

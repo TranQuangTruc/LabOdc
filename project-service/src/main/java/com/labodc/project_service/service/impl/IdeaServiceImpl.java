@@ -40,7 +40,7 @@ public class IdeaServiceImpl implements IdeaService {
     public List<Idea> getPendingIdeas() {
 
         return ideaRepository.findAll().stream()
-                .filter(i -> "PENDING".equals(i.getStatus()))
+                .filter(i -> "PENDING".equals(i.getStatus()) || "PENDING_CANCEL".equals(i.getStatus()))
                 .toList();
     }
 
@@ -71,9 +71,10 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public List<Idea> getApprovedProjects() {
-
         return ideaRepository.findAll().stream()
-                .filter(idea -> "APPROVED".equals(idea.getStatus()))
+                .filter(i -> "APPROVED".equals(i.getStatus()) ||
+                        "INVITED".equals(i.getStatus()) ||
+                        "ACCEPTED".equals(i.getStatus()))
                 .toList();
     }
 

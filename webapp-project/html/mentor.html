@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Mentor - Quản lý Dự án</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <h2>Dự án của tôi</h2>
+    <div id="project-container"></div>
+
+    <script src="../js/project-service.js"></script>
+    <script>
+        async function init() {
+            const projects = await fetchApprovedProjects();
+            const container = document.getElementById('project-container');
+            container.innerHTML = projects.map(p => `
+    <div class="card">
+        <h3>${p.title}</h3>
+        <p>Trạng thái: <strong>${p.status === 'INVITED' ? 'LỜI MỜI MỚI' : 'ĐANG THAM GIA'}</strong></p>
+        
+        ${p.status === 'INVITED' ? `
+            <button onclick="acceptInvite('${p.id}')" style="background:green; color:white;">Chấp nhận tham gia</button>
+            <button onclick="rejectInvite('${p.id}')" style="background:gray; color:white;">Từ chối</button>
+        ` : `
+            <button onclick="handleCancel('${p.id}')" style="background:blue; color:white;">Yêu cầu Hủy</button>
+        `}
+    </div>
+`).join('');
+        }
+
+        async function handleCancel(id) {
+            const reason = prompt("Nhập lý do hủy dự án:");
+            if (reason) {
+                await requestChangeOrCancel(id, "CANCEL", reason);
+                alert("Đã gửi yêu cầu!");
+                location.reload();
+            }
+        }
+        async function acceptInvite(id) {
+    if (confirm("Bạn có đồng ý tham gia dự án này không?")) {
+        try {
+            
+            const res = await fetch(`http://localhost:8080/api/v1/ideas/${id}/accept`, {
+                method: 'PUT'
+            });
+            
+            if (res.ok) {
+                alert("Bạn đã chấp nhận lời mời thành công!");
+                location.reload(); 
+            } else {
+                alert("Lỗi khi chấp nhận lời mời.");
+            }
+        } catch (err) {
+            console.error("Lỗi kết nối:", err);
+        }
+    }
+}
+async function rejectInvite(id) {
+    if (confirm("Bạn chắc chắn muốn từ chối lời mời này chứ?")) {
+        try {
+            const res = await fetch(`http://localhost:8080/api/v1/ideas/${id}/reject`, {
+                method: 'PUT'
+            });
+            
+            if (res.ok) {
+                alert("Đã từ chối lời mời.");
+                location.reload(); 
+            } else {
+                alert("Có lỗi xảy ra khi từ chối.");
+            }
+        } catch (err) {
+            console.error("Lỗi kết nối:", err);
+        }
+    }
+}
+        init();
+    </script>
+</body>
+</html>
