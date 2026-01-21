@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Home - LabOdc Admin</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="side" id="sidebar"></aside>
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2 id="pageTitle">LabOdc Admin</h2>
+          <div class="chips" id="chips"></div>
+        </div>
+        <div class="muted" style="font-size:12px">
+          Status: <span id="statusText" class="badge"><span class="dot"></span><span>Idle</span></span>
+        </div>
+      </div>
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <div class="toastWrap" id="toastWrap"></div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/index.js"></script>
+</body>
+</html>
