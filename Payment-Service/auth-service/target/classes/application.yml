@@ -1,0 +1,13 @@
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+labodc:
+  auth:
+    jwtSecret: ${JWT_SECRET:dev-secret-change-me-please}
+    jwtTtlSeconds: ${JWT_TTL_SECONDS:3600}

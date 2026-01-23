@@ -1,5 +1,6 @@
-FROM nginx:alpine
+FROM nginx:1.27-alpine
 
-COPY . /usr/share/nginx/html
+# Static UI + simple reverse-proxy to backend containers to avoid CORS issues.
 
-EXPOSE 80
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY public/ /usr/share/nginx/html/

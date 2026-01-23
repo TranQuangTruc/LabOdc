@@ -1,124 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>LabOdc Payment Console</title>
-  <style>
-    body {
-      font-family: Arial;
-      margin: 40px;
-      background: #f5f7fa;
-    }
-    h2 {
-      color: #333;
-    }
-    .box {
-      background: white;
-      padding: 20px;
-      margin-bottom: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      width: 500px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 6px;
-      margin-bottom: 10px;
-    }
-    button {
-      background: #4CAF50;
-      border: none;
-      padding: 10px 16px;
-      color: white;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    button.lab {
-      background: #2196F3;
-    }
-    pre {
-      background: #222;
-      color: #0f0;
-      padding: 10px;
-      overflow: auto;
-    }
-  </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>LabOdc Payment Demo</title>
+  <link rel="stylesheet" href="./assets/styles.css"/>
 </head>
 <body>
+  <header class="topbar">
+    <div class="brand">LabOdc</div>
+    <div class="muted" id="bases"></div>
+    <div class="spacer"></div>
+    <div id="whoami" class="muted">Chưa đăng nhập</div>
+    <button id="logout" class="btn ghost" disabled>Logout</button>
+  </header>
 
-<h1>LabOdc Payment Service</h1>
+  <main class="container">
+    <section id="toast" class="toast hidden"></section>
 
-<div class="box">
-  <h2>Enterprise Pay</h2>
-  <label>Project ID</label>
-  <input id="epProject" placeholder="UUID project">
-  <label>Amount</label>
-  <input id="epAmount" placeholder="10000000">
+    <section class="card">
+      <h2>1) Login (Auth Service)</h2>
+      <div class="grid2">
+        <label>Username<input id="username" placeholder="enterprise"/></label>
+        <label>Password<input id="password" type="password" placeholder="enterprise"/></label>
+      </div>
+      <div class="row">
+        <button id="login" class="btn primary">Login</button>
+        <button id="demo" class="btn">Dùng demo enterprise</button>
+      </div>
+      <pre id="loginOut" class="code"></pre>
+    </section>
 
-  <button onclick="enterprisePay()">Enterprise Pay</button>
-</div>
+    <section class="card">
+      <h2>2) Enterprise Pay</h2>
+      <div class="grid2">
+        <label>Project ID<input id="projectId" placeholder="PRJ-001"/></label>
+        <label>Amount (VND)<input id="amount" type="number" placeholder="1000000"/></label>
+      </div>
+      <div class="row">
+        <button id="enterprisePay" class="btn primary">POST /api/payments/enterprise-pay</button>
+      </div>
+      <pre id="payOut" class="code"></pre>
+    </section>
 
-<div class="box">
-  <h2>Lab Advance to Team</h2>
-  <label>Project ID</label>
-  <input id="labProject" placeholder="UUID project">
-  <label>Amount</label>
-  <input id="labAmount" placeholder="3000000">
+    <section class="card">
+      <h2>3) Lab Advance (Lab Admin)</h2>
+      <div class="grid2">
+        <label>Project ID<input id="projectId2" placeholder="PRJ-002"/></label>
+        <label>Amount (VND)<input id="amount2" type="number" placeholder="2000000"/></label>
+      </div>
+      <div class="row">
+        <button id="labAdvance" class="btn primary">POST /api/payments/lab-advance</button>
+      </div>
+    </section>
 
-  <button class="lab" onclick="labAdvance()">Lab Advance</button>
-</div>
+    <section class="card">
+      <h2>4) Get Payment By ID</h2>
+      <div class="grid2">
+        <label>Payment ID<input id="paymentId" placeholder="(UUID)"/></label>
+        <label>&nbsp;<div class="muted">Sẽ tự điền sau khi tạo payment</div></label>
+      </div>
+      <div class="row">
+        <button id="getPayment" class="btn">GET /api/payments/{id}</button>
+      </div>
+      <pre id="getOut" class="code"></pre>
+    </section>
+  </main>
 
-<div class="box">
-  <h2>Get Payment</h2>
-  <label>Payment ID</label>
-  <input id="paymentId" placeholder="UUID payment">
-  <button onclick="getPayment()">Get</button>
-</div>
-
-<div class="box">
-  <h2>Response</h2>
-  <pre id="output"></pre>
-</div>
-
-<script>
-const BASE = "http://localhost:8080/api/payments";
-
-function show(res) {
-  document.getElementById("output").textContent =
-    JSON.stringify(res, null, 2);
-}
-
-async function enterprisePay() {
-  const res = await fetch(BASE + "/enterprise-pay", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({
-      projectId: document.getElementById("epProject").value,
-      amount: document.getElementById("epAmount").value
-    })
-  });
-  show(await res.json());
-}
-
-async function labAdvance() {
-  const res = await fetch(BASE + "/lab-advance", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({
-      projectId: document.getElementById("labProject").value,
-      amount: document.getElementById("labAmount").value
-    })
-  });
-  show(await res.json());
-}
-
-async function getPayment() {
-  const id = document.getElementById("paymentId").value;
-  const res = await fetch(BASE + "/" + id);
-  show(await res.json());
-}
-</script>
-
+  <script type="module" src="./js/ui.js"></script>
 </body>
 </html>
