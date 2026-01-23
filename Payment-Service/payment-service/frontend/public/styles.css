@@ -1,0 +1,101 @@
+:root {
+  --bg: #0b1020;
+  --card: #121a33;
+  --text: #e7ecff;
+  --muted: #aeb7df;
+  --border: rgba(255, 255, 255, 0.08);
+  --btn: #2a3a77;
+  --btn2: transparent;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: radial-gradient(1200px 800px at 10% 10%, #1a2550, var(--bg));
+  color: var(--text);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 16px 64px;
+}
+
+header {
+  margin-bottom: 16px;
+}
+
+h1 { margin: 0 0 8px; font-size: 28px; }
+h2 { margin: 0 0 14px; font-size: 18px; }
+
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.muted { color: var(--muted); margin: 8px 0 0; }
+code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 8px; }
+
+label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.18);
+  color: var(--text);
+  outline: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+button {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--btn);
+  color: var(--text);
+  cursor: pointer;
+}
+button.ghost { background: var(--btn2); }
+
+.status {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.18);
+}
+
+.label { color: var(--muted); }
+
+.output {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.22);
+  overflow: auto;
+  min-height: 140px;
+}
+
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; }
+  .row { flex-wrap: wrap; }
+}

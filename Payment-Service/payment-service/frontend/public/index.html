@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LabOdc Payment Platform</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>LabOdc Payment Platform</h1>
+        <p class="muted">
+          UI is served on <code>http://localhost:3000</code> and proxies to backend containers (no CORS).
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>1) Auth (auth-service)</h2>
+        <div class="grid">
+          <div>
+            <label>Username</label>
+            <input id="username" placeholder="admin" value="admin" />
+          </div>
+          <div>
+            <label>Password</label>
+            <input id="password" type="password" placeholder="admin123" value="admin123" />
+          </div>
+        </div>
+        <div class="row">
+          <button id="btnLogin">Login</button>
+          <button id="btnLogout" class="ghost">Logout</button>
+        </div>
+        <p class="muted">Default users: <code>admin/admin123</code>, <code>user/user123</code></p>
+        <div class="status">
+          <div><span class="label">Auth status:</span> <span id="authStatus">Not logged in</span></div>
+          <div><span class="label">Token:</span> <code id="tokenText">(empty)</code></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2) Payments (payment-service)</h2>
+        <div class="grid">
+          <div>
+            <label>Sender</label>
+            <input id="sender" placeholder="alice" value="alice" />
+          </div>
+          <div>
+            <label>Receiver</label>
+            <input id="receiver" placeholder="bob" value="bob" />
+          </div>
+          <div>
+            <label>Amount</label>
+            <input id="amount" type="number" step="0.01" placeholder="10.5" value="10.5" />
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="btnCreatePayment">Create payment</button>
+          <button id="btnListPayments" class="ghost">List payments</button>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label>Get payment by ID</label>
+            <input id="paymentId" placeholder="1" />
+          </div>
+          <div class="row" style="align-items:flex-end;">
+            <button id="btnGetPayment" class="ghost">Fetch</button>
+          </div>
+        </div>
+
+        <pre id="output" class="output">Ready.</pre>
+      </section>
+    </div>
+
+    <script defer src="/ui.js"></script>
+  </body>
+</html>

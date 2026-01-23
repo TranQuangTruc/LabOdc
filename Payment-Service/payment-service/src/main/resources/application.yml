@@ -3,20 +3,40 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/paymentdb
-    username: payment
-    password: payment
-    driver-class-name: org.postgresql.Driver
-
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/labodc}
+    username: ${SPRING_DATASOURCE_USERNAME:labodc}
+    password: ${SPRING_DATASOURCE_PASSWORD:labodc}
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
-
-  redis:
-    host: redis
-    port: 6379
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
 
   rabbitmq:
-    host: rabbitmq
-    port: 5672
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:labodc}
+    password: ${SPRING_RABBITMQ_PASSWORD:labodc}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+labodc:
+  auth:
+    jwtSecret: ${JWT_SECRET:dev-secret-change-me-please}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

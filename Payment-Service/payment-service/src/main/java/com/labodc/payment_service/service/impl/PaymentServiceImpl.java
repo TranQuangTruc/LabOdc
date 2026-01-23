@@ -1,9 +1,12 @@
 package com.labodc.payment_service.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +26,18 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final FundDistributionRepository fundDistributionRepository;
     private final ProjectPaymentRepository projectPaymentRepository;
+    private final RabbitTemplate rabbitTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public PaymentServiceImpl(
             FundDistributionRepository fundDistributionRepository,
-            ProjectPaymentRepository projectPaymentRepository) {
+            ProjectPaymentRepository projectPaymentRepository,
+            RabbitTemplate rabbitTemplate,
+            KafkaTemplate<String, Object> kafkaTemplate) {
         this.fundDistributionRepository = fundDistributionRepository;
         this.projectPaymentRepository = projectPaymentRepository;
+        this.rabbitTemplate = rabbitTemplate;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     // ============================
@@ -53,8 +62,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         fundDistributionRepository.save(dist);
 
-        // 3. Response
-        return buildResponse(payment.getId(), dist, payment.getStatus());
+        // 3. Response + publish events (RabbitMQ + Kafka)
+        PaymentResponseDTO res = buildResponse(payment.getId(), dist, payment.getStatus());
+        publishPaymentEvent(res);
+        return res;
     }
 
     // ============================
@@ -77,7 +88,16 @@ public class PaymentServiceImpl implements PaymentService {
 
         fundDistributionRepository.save(dist);
 
-        return buildResponse(payment.getId(), dist, payment.getStatus());
+        PaymentResponseDTO res = buildResponse(payment.getId(), dist, payment.getStatus());
+        publishPaymentEvent(res);
+        return res;
+    }
+
+    private void publishPaymentEvent(PaymentResponseDTO res) {
+        // RabbitMQ: exchange + routing key (can be bound to queues by other services)
+        rabbitTemplate.convertAndSend("payment.exchange", "payment.created", res);
+        // Kafka: topic
+        kafkaTemplate.send("payment.created.v1", res.getPaymentId().toString(), res);
     }
 
     // ============================
@@ -89,12 +109,10 @@ public class PaymentServiceImpl implements PaymentService {
         ProjectPayment payment = projectPaymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        FundDistribution dist = fundDistributionRepository
-                .findAll()
-                .stream()
-                .filter(d -> d.getPaymentId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Distribution not found"));
+        FundDistribution dist = fundDistributionRepository.findByPaymentId(id);
+        if (dist == null) {
+            throw new RuntimeException("Distribution not found");
+        }
 
         return buildResponse(payment.getId(), dist, payment.getStatus());
     }
@@ -104,9 +122,12 @@ public class PaymentServiceImpl implements PaymentService {
     // ============================
     private FundDistribution calculateDistribution(BigDecimal total) {
 
-        BigDecimal team = total.multiply(new BigDecimal("0.6"));
-        BigDecimal mentor = total.multiply(new BigDecimal("0.2"));
-        BigDecimal lab = total.multiply(new BigDecimal("0.2"));
+        // Rule: 70% Team, 20% Mentor, 10% Lab
+        // Assume VND (no decimals). We still guard with rounding.
+        BigDecimal team = total.multiply(new BigDecimal("0.70")).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal mentor = total.multiply(new BigDecimal("0.20")).setScale(0, RoundingMode.HALF_UP);
+        // Make sure sum exactly equals total (avoid rounding drift)
+        BigDecimal lab = total.subtract(team).subtract(mentor);
 
         FundDistribution d = new FundDistribution();
         d.setTeamAmount(team);
