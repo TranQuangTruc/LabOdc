@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @Builder
@@ -14,7 +15,7 @@ import java.time.Instant;
 public class ProjectTaskResponse {
     String id;
     String projectId;
-    String talentId;
+    List<String> talentIds;
     String mentorId;
     String taskCode;
     String taskName;

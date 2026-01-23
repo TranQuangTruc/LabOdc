@@ -19,24 +19,30 @@ import java.util.List;
 public class ProjectTaskController {
     ProjectTaskService projectTaskService;
 
-    @PreAuthorize("hasRole('MENTOR')")
+    //@PreAuthorize("hasRole('MENTOR')")
     @PostMapping("")
     public ApiResponse<ProjectTaskResponse> createTask(@RequestBody ProjectTaskRequest request){
-        return ApiResponse.<ProjectTaskResponse>builder().build();
+        return ApiResponse.<ProjectTaskResponse>builder()
+                .result(projectTaskService.creatTask(request))
+                .build();
     }
 
-    @PreAuthorize("hasRole('TALENT')")
+    //@PreAuthorize("hasRole('TALENT')")
     @GetMapping("/{projectId}/{talentId}")
     public ApiResponse<List<ProjectTaskResponse>> getMyTask(
             @PathVariable String projectId,
             @PathVariable String talentId
     ) {
-        return ApiResponse.<List<ProjectTaskResponse>>builder().build();
+        return ApiResponse.<List<ProjectTaskResponse>>builder()
+                .result(projectTaskService.getMyTask(projectId, talentId))
+                .build();
     }
 
-    @PreAuthorize("hasRole('MENTOR')")
+    //@PreAuthorize("hasRole('MENTOR')")
     @GetMapping("/{projectId}")
     public ApiResponse<List<ProjectTaskResponse>> getMyTaskForMentor(@PathVariable String projectId){
-        return ApiResponse.<List<ProjectTaskResponse>>builder().build();
+        return ApiResponse.<List<ProjectTaskResponse>>builder()
+                .result(projectTaskService.getMyTaskForMentor(projectId))
+                .build();
     }
 }

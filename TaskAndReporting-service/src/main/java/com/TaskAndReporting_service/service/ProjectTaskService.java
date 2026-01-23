@@ -27,7 +27,7 @@ public class ProjectTaskService {
     }
     public List<ProjectTaskResponse> getMyTask(String projectId, String talentId){
         List<ProjectTask> byProjectIdAndTalentId =
-                projectTaskRepository.findByProjectIdAndTalentId(projectId, talentId);
+                projectTaskRepository.findByProjectIdAndTalentIdsContaining(projectId, talentId);
         return byProjectIdAndTalentId.stream().map(projectTaskMapper::toProjectTaskResponse).toList();
     }
     public List<ProjectTaskResponse> getMyTaskForMentor(String projectId){

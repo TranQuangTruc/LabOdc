@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @Builder
@@ -12,7 +13,7 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProjectTaskRequest {
     String projectId;
-    String talentId;
+    List<String> talentIds;
     String mentorId;
     String taskCode;
     String taskName;

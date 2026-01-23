@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ProjectTaskRepository extends JpaRepository<ProjectTask, String> {
-    List<ProjectTask> findByProjectIdAndTalentId(String projectId, String talentId);
+    List<ProjectTask> findByProjectIdAndTalentIdsContaining(String projectId, String talentId);
     List<ProjectTask> findByProjectId(String projectId);
 }
