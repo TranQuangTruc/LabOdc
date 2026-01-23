@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: notification-service
+
+  datasource:
+    url: jdbc:postgresql://labodc-notification-postgres:5432/labodc
+    username: labodc
+    password: labodc
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  rabbitmq:
+    host: labodc-notification-rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

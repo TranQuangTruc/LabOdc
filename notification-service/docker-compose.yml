@@ -1,0 +1,33 @@
+services:
+  notification-service:
+    container_name: labodc-notification-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - notification-postgres
+      - notification-rabbitmq
+
+  notification-postgres:
+    image: postgres:15
+    container_name: labodc-notification-postgres
+    environment:
+      POSTGRES_DB: labodc
+      POSTGRES_USER: labodc
+      POSTGRES_PASSWORD: labodc
+    ports:
+      - "5433:5432"   
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  notification-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: labodc-notification-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+
+volumes:
+  postgres_data:
