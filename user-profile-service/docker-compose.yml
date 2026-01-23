@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: profile-postgres
+    environment:
+      POSTGRES_DB: labodc
+      POSTGRES_USER: labodc
+      POSTGRES_PASSWORD: labodc
+    ports:
+      - "5433:5432"
+    volumes:
+      - profile_postgres_data:/var/lib/postgresql/data
+    networks:
+      - profile-net
+
+  redis:
+    image: redis:7
+    container_name: profile-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - profile-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: profile-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    networks:
+      - profile-net
+
+  user-profile-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-profile-service
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    networks:
+      - profile-net
+
+networks:
+  profile-net:
+
+volumes:
+  profile_postgres_data:
